@@ -2,18 +2,21 @@ import numpy as matrix
 
 
 class NeuralNetwork:
-    def __init__(self, nb_input, nb_output, nb_neurons, learning_rate):
-        self.nbInput = nb_input
-        self.nbOutput = nb_output
-        self.nbNeurons = nb_neurons
-        self.w1 = matrix.random.randn(nb_neurons, nb_input)
-        self.b1 = matrix.random.randn(nb_neurons, 1)
-        self.w2 = matrix.random.randn(nb_output, nb_neurons)
-        self.b2 = matrix.random.randn(nb_output, 1)
+    def __init__(self, learning_rate, layers):
+        self.learning_rate = learning_rate
+        self.layers = layers
+        self.size = len(layers)
+        self.weights = []
+        self.bias = []
+        for i in range(0, self.size-1):
+            self.weights.append(matrix.random.randn(layers[i+1], layers[i]))
+        for j in range(1, self.size):
+            self.bias.append(matrix.random.randn(layers[j], 1))
         self.errors = []
         self.a_s = []
         self.z_s = []
-        self.learning_rate = learning_rate
+        self.a = []
+        self.z = []
         self.z1 = None
         self.a1 = None
         self.z2 = None
@@ -29,28 +32,58 @@ class NeuralNetwork:
 
     def propagate(self, x):
         """Method used to get an input x go through the neuronal network and outputs a2"""
-        self.z1 = matrix.dot(self.w1, x) + self.b1
-        self.a1 = self.sigmoid(self.z1)
-        self.z2 = matrix.dot(self.w2, self.a1) + self.b2
-        self.a2 = self.sigmoid(self.z2)
+        self.a.append(x)
+        self.z.append(matrix.dot(self.weights[0], x)+self.bias[0])
+        self.a.append(self.sigmoid(self.z[0]))
+        for i in range(1, self.size-1):
+            self.z.append(matrix.dot(self.weights[i], self.z[i-1]))
+            self.a.append(self.sigmoid(self.z[i]))
+        #self.z1 = matrix.dot(self.w1, x) + self.b1
+        #self.a1 = self.sigmoid(self.z1)
+        #self.z2 = matrix.dot(self.w2, self.a1) + self.b2
+        #self.a2 = self.sigmoid(self.z2)
         z = [self.z1, self.z2]
-        self.z_s.append(z)
+        self.z_s.append(self.z)
         a = [x, self.a1]
-        self.a_s.append(a)
-        return self.a2
+        self.a_s.append(self.a)
+        return self.a[len(self.a)-1]
 
     def back_propagation(self, x, y):
         """Calculate the errors vectors for a given vector"""
+        error = [0] * (self.size-1)
         y_hat = self.propagate(x)
-        error_2 = matrix.multiply(-(y - y_hat), self.sigmoid_prime(self.z2))
-        error_1 = (matrix.dot(self.w2.T, error_2) * self.sigmoid_prime(self.z1))
-        error = [error_1, error_2]
+        error[len(self.layers)-2] = matrix.multiply(-(y - y_hat), self.sigmoid_prime(self.z[len(self.z)-1]))
+        for i in range(1, len(self.layers)-1):
+            error[len(self.layers)-2-i] = matrix.dot(self.weights[len(self.layers)-1-i].T, error[len(self.layers)-1-i])*self.sigmoid_prime(self.z[len(self.layers)-2-i])
+
+
+        #error_1 = (matrix.dot(self.w2.T, error_2) * self.sigmoid_prime(self.z1))
+        #error = [error_1, error_2]
         self.errors.append(error)
 
     def gradient_descent(self, m):
         """Updates the bias and weights using the errors vectors of all
         exemples that had been through backpropagation"""
-        tampon = self.errors[0][0]
+        for a in range(0, len(self.errors)):
+            tampon = self.errors[0][a]
+            for i in range(1, len(self.errors)):
+                tampon = tampon + self.errors[i][a]
+            tampon = tampon * self.learning_rate / m
+            self.bias[a] = self.bias[a] - tampon
+
+        for b in range(0, len(self.errors)):
+            tampon = matrix.dot(self.errors[0][b], matrix.transpose(self.a_s[0][b]))
+            for i in range(1, len(self.errors)):
+                tampon = tampon + matrix.dot(self.errors[i][b], matrix.transpose(self.a_s[i][b]))
+            tampon = tampon * self.learning_rate / m
+            self.weights[b] = self.weights[b] - tampon
+
+
+
+
+
+
+        """tampon = self.errors[0][0]
         for i in range(1, len(self.errors)):
             tampon = tampon + self.errors[i][0]
 
@@ -76,10 +109,12 @@ class NeuralNetwork:
             tampon = tampon + matrix.dot(self.errors[i][1], matrix.transpose(self.a_s[i][1]))
 
         tampon = tampon * self.learning_rate / m
-        self.w2 = self.w2 - tampon
+        self.w2 = self.w2 - tampon"""
 
     def clear(self):
         """Clears the errors, as, and zs after a gradient descent"""
         self.errors.clear()
         self.a_s.clear()
         self.z_s.clear()
+        self.a.clear()
+        self.z.clear()
