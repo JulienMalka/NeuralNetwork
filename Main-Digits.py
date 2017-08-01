@@ -4,7 +4,7 @@ from Image import *
 from random import shuffle
 import numpy as np
 
-NN = NeuralNetwork(28 * 28, 10, 30, 10)
+NN = NeuralNetwork(28 * 28, 10, 30, 3)
 data = MNIST('Data')
 images_data, labels_data = data.load_training()
 images_test, labels_test = data.load_testing()
@@ -31,7 +31,7 @@ for j in range(0, epoch_number):
 
     while h < len(images) - 10:
 
-        for g in (h, h + batch_size):
+        for g in range(h, h + batch_size):
             image = np.array(images[g].image) / 255
             """Training phase"""
             NN.back_propagation(np.reshape(image, (28 * 28, 1)), to_vector(images[g].label))
