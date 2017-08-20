@@ -17,14 +17,7 @@ class NeuralNetwork:
         self.z_s = []
         self.a = []
         self.z = []
-        self.z1 = None
-        self.a1 = None
-        self.z2 = None
-        self.a2 = None
-        self.w1 = self.weights[0]
-        self.w2 = self.weights[1]
-        self.b1 = self.bias[0]
-        self.b2 = self.bias[1]
+
 
     @staticmethod
     def sigmoid(z):
@@ -42,11 +35,7 @@ class NeuralNetwork:
         for i in range(0, self.size-1):
             self.z.append(matrix.dot(self.weights[i], self.a[i]) + self.bias[i])
             self.a.append(self.sigmoid(self.z[i]))
-        self.z1 = matrix.dot(self.w1, x) + self.b1
-        self.a1 = self.sigmoid(self.z1)
-        self.z2 = matrix.dot(self.w2, self.a1) + self.b2
-        self.a2 = self.sigmoid(self.z2)
-        z = [self.z1, self.z2]
+
         self.z_s.append(self.z.copy())
         retour = self.a.copy()
         del self.a[-1]
@@ -63,9 +52,7 @@ class NeuralNetwork:
         for i in range(1, self.size-1):
             error[-(i+1)] = matrix.dot(self.weights[-i].T, error[-i]) * self.sigmoid_prime(self.z[-(i+1)])
 
-        error_2 = matrix.multiply(-(y - y_hat), self.sigmoid_prime(self.z2))
-        error_1 = (matrix.dot(self.w2.T, error_2) * self.sigmoid_prime(self.z1))
-        #error = [error_1, error_2]
+
         self.errors.append(error)
         self.a.clear()
         self.z.clear()
@@ -88,38 +75,6 @@ class NeuralNetwork:
             tampon = tampon * self.learning_rate / m
             self.weights[b] = self.weights[b] - tampon
 
-
-
-
-
-
-        tampon = self.errors[0][0]
-        for i in range(1, len(self.errors)):
-            tampon = tampon + self.errors[i][0]
-
-        tampon = tampon * self.learning_rate / m
-        self.b1 = self.b1 - tampon
-
-        tampon = self.errors[0][1]
-        for i in range(1, len(self.errors)):
-            tampon = tampon + self.errors[i][1]
-
-        tampon = tampon * self.learning_rate / m
-
-        self.b2 = self.b2 - tampon
-        tampon = matrix.dot(self.errors[0][0], matrix.transpose(self.a_s[0][0]))
-        for i in range(1, len(self.errors)):
-            tampon = tampon + matrix.dot(self.errors[i][0], matrix.transpose(self.a_s[i][0]))
-
-        tampon = tampon * self.learning_rate / m
-        self.w1 = self.w1 - tampon
-
-        tampon = matrix.dot(self.errors[0][1], matrix.transpose(self.a_s[0][1]))
-        for i in range(1, len(self.errors)):
-            tampon = tampon + matrix.dot(self.errors[i][1], matrix.transpose(self.a_s[i][1]))
-
-        tampon = tampon * self.learning_rate / m
-        self.w2 = self.w2 - tampon
 
         self.clear()
 
