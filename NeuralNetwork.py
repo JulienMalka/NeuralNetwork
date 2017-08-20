@@ -21,6 +21,10 @@ class NeuralNetwork:
         self.a1 = None
         self.z2 = None
         self.a2 = None
+        self.w1 = self.weights[0]
+        self.w2 = self.weights[1]
+        self.b1 = self.bias[0]
+        self.b2 = self.bias[1]
 
     @staticmethod
     def sigmoid(z):
@@ -32,19 +36,23 @@ class NeuralNetwork:
 
     def propagate(self, x):
         """Method used to get an input x go through the neuronal network and outputs a2"""
+        self.clear()
         self.a.append(x)
+
         for i in range(0, self.size-1):
-            self.z.append(matrix.dot(self.weights[i], self.a[i]))
+            self.z.append(matrix.dot(self.weights[i], self.a[i]) + self.bias[i])
             self.a.append(self.sigmoid(self.z[i]))
-        #self.z1 = matrix.dot(self.w1, x) + self.b1
-        #self.a1 = self.sigmoid(self.z1)
-        #self.z2 = matrix.dot(self.w2, self.a1) + self.b2
-        #self.a2 = self.sigmo0id(self.z2)
-       # z = [self.z1, self.z2]
+        self.z1 = matrix.dot(self.w1, x) + self.b1
+        self.a1 = self.sigmoid(self.z1)
+        self.z2 = matrix.dot(self.w2, self.a1) + self.b2
+        self.a2 = self.sigmoid(self.z2)
+        z = [self.z1, self.z2]
         self.z_s.append(self.z.copy())
+        retour = self.a.copy()
+        del self.a[-1]
 
         self.a_s.append(self.a.copy())
-        return self.a[-1]
+        return retour[-1]
 
     def back_propagation(self, x, y):
         """Calculate the errors vectors for a given vector"""
@@ -53,10 +61,10 @@ class NeuralNetwork:
         y_hat = self.propagate(x)
         error[-1] = matrix.multiply(-(y - y_hat), self.sigmoid_prime(self.z[-1]))
         for i in range(1, self.size-1):
-            error[-(i+1)] = matrix.dot(self.weights[-i].T, error[-i])*self.sigmoid_prime(self.z[-(i+1)])
+            error[-(i+1)] = matrix.dot(self.weights[-i].T, error[-i]) * self.sigmoid_prime(self.z[-(i+1)])
 
-
-        #error_1 = (matrix.dot(self.w2.T, error_2) * self.sigmoid_prime(self.z1))
+        error_2 = matrix.multiply(-(y - y_hat), self.sigmoid_prime(self.z2))
+        error_1 = (matrix.dot(self.w2.T, error_2) * self.sigmoid_prime(self.z1))
         #error = [error_1, error_2]
         self.errors.append(error)
         self.a.clear()
@@ -85,7 +93,7 @@ class NeuralNetwork:
 
 
 
-        """tampon = self.errors[0][0]
+        tampon = self.errors[0][0]
         for i in range(1, len(self.errors)):
             tampon = tampon + self.errors[i][0]
 
@@ -111,7 +119,9 @@ class NeuralNetwork:
             tampon = tampon + matrix.dot(self.errors[i][1], matrix.transpose(self.a_s[i][1]))
 
         tampon = tampon * self.learning_rate / m
-        self.w2 = self.w2 - tampon"""
+        self.w2 = self.w2 - tampon
+
+        self.clear()
 
     def clear(self):
         """Clears the errors, as, and zs after a gradient descent"""
