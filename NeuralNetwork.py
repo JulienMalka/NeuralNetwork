@@ -11,7 +11,7 @@ class NeuralNetwork:
         self.weights = []
         self.bias = []
         for i in range(0, self.size - 1):
-            self.weights.append(matrix.random.randn(layers[i + 1], layers[i]))
+            self.weights.append(matrix.random.randn(layers[i + 1], layers[i])/matrix.sqrt(layers[i+1]))
         for j in range(1, self.size):
             self.bias.append(matrix.random.randn(layers[j], 1))
         self.errors = []
