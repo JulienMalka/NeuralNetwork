@@ -71,18 +71,18 @@ class NeuralNetwork:
         """Updates the bias and weights using the errors vectors of all
         exemples that had been through backpropagation"""
         for a in range(0, self.size - 1):
-            tampon = self.errors[0][a]
+            sum = self.errors[0][a]
             for i in range(1, len(self.errors)):
-                tampon = tampon + self.errors[i][a]
-            tampon = tampon * self.learning_rate / m
-            self.bias[a] = self.bias[a] - tampon
+                sum = sum + self.errors[i][a]
+            sum = sum * self.learning_rate / m
+            self.bias[a] = self.bias[a] - sum
 
         for b in range(0, self.size - 1):
-            tampon = np.dot(self.errors[0][b], np.transpose(self.a_s[0][b]))
+            sum = np.dot(self.errors[0][b], np.transpose(self.a_s[0][b]))
             for i in range(1, len(self.errors)):
-                tampon = tampon + np.dot(self.errors[i][b], np.transpose(self.a_s[i][b]))
-            tampon = tampon * self.learning_rate / m
-            self.weights[b] = self.weights[b] - tampon
+                sum = sum + np.dot(self.errors[i][b], np.transpose(self.a_s[i][b]))
+            sum = sum * self.learning_rate / m
+            self.weights[b] = self.weights[b] - sum
 
         self.clear()
 
