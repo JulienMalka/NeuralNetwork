@@ -1,6 +1,8 @@
 # Python Neural Network
 
 ## Introduction
+
+
 This python project is an implementation of a neural network with a general number of hidden layers. One of the implementations provided in the examples is an handwritten digits classifier.
 
 The file NeuralNetwork.py is a class describing a NeuralNetwork with 1 input layer, n hidden layers, 1 output layer.
@@ -11,7 +13,12 @@ The Main file is using the MNIST database to train a NeuronalNetwork with 30 neu
 
 It achieve about 95% accuracy on the MNIST testing set
 
-You have to drop the 4 MNIST files in a "Data" folder for the MNIST loader to work.
+
+### Requirements 
+
+You need to install numpy and python-mnist, this can be done simply with pip.
+You have to drop the 4 MNIST files in a "Data" folder in the project for the MNIST loader to work
+(you can get them there : http://yann.lecun.com/exdb/mnist/). The names of the file can change with the versions so make sure they are named only with dashes, no points in the name (if you didn't name them correctly just look at the errors it will tell you what file it was looking for).
 
 
 ## Documentation : The NeuralNetwork class
