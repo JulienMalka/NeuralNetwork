@@ -14,7 +14,7 @@ The Main file is using the MNIST database to train a NeuronalNetwork with 30 neu
 It achieve about 95% accuracy on the MNIST testing set
 
 
-### Requirement 
+### Requirements 
 
 You need to install numpy and python-mnist, this can be done simply with pip.
 You have to drop the 4 MNIST files in a "Data" folder in the project for the MNIST loader to work
