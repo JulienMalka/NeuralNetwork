@@ -40,22 +40,19 @@ class NeuralNetwork:
 
     def propagate(self, x):
         """Method used to get an input x go through the neuronal network and outputs a2"""
-        self.clear()
+        self.a.clear()
+        self.z.clear()
         self.a.append(x)
 
         for i in range(0, self.size - 1):
             self.z.append(np.dot(self.weights[i], self.a[i]) + self.bias[i])
             self.a.append(self.sigmoid(self.z[i]))
 
-        self.z_s.append(self.z.copy())
-        retour = self.a.copy()
-        del self.a[-1]
-
-        self.a_s.append(self.a.copy())
-        return retour[-1]
+        return self.a[-1]
 
     def back_propagation(self, x, y):
-        """Calculate the errors vectors for a given vector"""
+        """Calculate the errors vectors for a given vector, and keep them with
+        the activations of each layer until the next gradient descent"""
 
         error = [0] * (self.size - 1)
         y_hat = self.propagate(x)
@@ -64,6 +61,8 @@ class NeuralNetwork:
             error[-(i + 1)] = np.dot(self.weights[-i].T, error[-i]) * self.sigmoid_prime(self.z[-(i + 1)])
 
         self.errors.append(error)
+        self.a_s.append(self.a[:-1])
+        self.z_s.append(self.z.copy())
         self.a.clear()
         self.z.clear()
 
